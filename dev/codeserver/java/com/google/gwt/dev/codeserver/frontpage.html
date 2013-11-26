@@ -67,6 +67,7 @@ function makeDevModeOnBookmarklet() {
 function makeDevModeOffBookmarklet() {
   var javascript =
           "{var toRemove = [];" +
+          " try {" +
           " for(var i = 0; i<sessionStorage.length; i++) {" +
           "  var key = sessionStorage.key(i);" +
           "  if (key.indexOf('__gwtDevModeHook:') == 0) {" +
@@ -74,6 +75,10 @@ function makeDevModeOffBookmarklet() {
           "  }}" +
           " for (var j = 0; j<toRemove.length; j++) {" +
           "   sessionStorage.removeItem(toRemove[j]);" +
+          "  }" +
+          " } catch(err) {" +
+          "   console.info('Could not disable Super Dev Mode due to: ' + err);" +
+          " }" +
           " } window.location.reload();}";
   return makeBookmarklet("Dev Mode Off", javascript);
 }

@@ -136,13 +136,17 @@
 
     var mod = modules_on_page[module_name];
 
-    var dev_mode_key = '__gwtDevModeHook:' + module_name;
-    var dev_mode_on = mod['superdevmode'] ||
-        window.sessionStorage[dev_mode_key];
+	try {
+	    var dev_mode_key = '__gwtDevModeHook:' + module_name;
+	    var dev_mode_on = mod['superdevmode'] ||
+	        window.sessionStorage[dev_mode_key];
 
-    if (!dev_mode_on && !mod.canRedirect) {
-      return 'This module doesn\'t have Super Dev Mode enabled';
-    }
+	    if (!dev_mode_on && !mod.canRedirect) {
+	      return 'This module doesn\'t have Super Dev Mode enabled';
+	    }
+	} catch(err) {
+		return 'Super Dev Mode will not work due to: ' + err;
+	}
 
     // looks okay
     return null;
@@ -329,13 +333,22 @@
     if (!props.length) {
       // There is only one permutation, maybe because we're in dev mode already.
       // Use the cached value if present.
-      var cached = window.sessionStorage[session_key];
-      return cached || '';
+	  try {
+	      var cached = window.sessionStorage[session_key];
+	      return cached || '';
+	  } catch(err) {
+		  console.info("Could not retrieve cached session key due to: " + err);
+		  return '';
+	  }
     }
 
     var encoded = props.join('&') + '&';
     // Cache it for the next recompile.
-    window.sessionStorage[session_key] = encoded;
+	try {
+        window.sessionStorage[session_key] = encoded;
+	} catch(err) {
+		console.info("Could not cache session key due to: " + err);
+	}
     return encoded;
   }
 
@@ -354,10 +367,14 @@
    *     (with trailing slash).
    */
   function reloadInDevMode(module_name, codeserver_url) {
-    var key = '__gwtDevModeHook:' + module_name;
-    sessionStorage[key] = codeserver_url + module_name + '/' +
-        module_name + '.nocache.js';
-    window.location.reload();
+	try {
+		var key = '__gwtDevModeHook:' + module_name;
+	    sessionStorage[key] = codeserver_url + module_name + '/' +
+	        module_name + '.nocache.js';
+	    window.location.reload();
+	} catch (err) {
+		console.info("Dev Mode could not be loaded due to: " + err);
+	}
   }
 
   /**

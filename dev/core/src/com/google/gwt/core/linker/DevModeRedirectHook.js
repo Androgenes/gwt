@@ -28,7 +28,12 @@ var devModeKey = '__gwtDevModeHook:__MODULE_NAME__';
 
 // If dev mode is on, the Bookmarklet previously saved the code server's URL
 // to session storage.
-var devModeUrl = $wnd.sessionStorage[devModeKey];
+var devModeUrl = null;
+try {
+	devModeUrl = $wnd.sessionStorage[devModeKey];
+} catch(err) {
+	console.info("Could not retrieve Dev Mode url due to: " + err);
+}
 
 if (devModeUrl && !$wnd[devModeKey]) {
   $wnd[devModeKey] = true; // Don't try to redirect more than once,
